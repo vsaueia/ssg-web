@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/WEB-INF/templates/master.xhtml">
+	
+	<ui:define name="titulo">
+		#{msg['menu.servicos.cliente.titulo']}
+	</ui:define>
+
+	<ui:define name="content">
+		<p:breadCrumb>
+			<p:menuitem value="SSG" url="/index.xhtml"/>
+			<p:menuitem value="#{msg['menu.servicos.cliente.titulo']}" url="#"/>
+		</p:breadCrumb>
+		
+		<p:spacer width="100%" height="20px"/>
+	
+		<h:form style="width: 400px; margin: auto">
+			<h:panelGrid>
+				<p:row>
+					<p:column>
+						<h:outputLabel value="#{msg['consultar.servico.descricao']}:" />
+					</p:column>
+					<p:column>
+						<p:inputText id="descricao" value="#{consultarServicosMB.search.descricao}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<h:outputLabel value="#{msg['consultar.servico.categoria']}:" />
+					</p:column>
+					<p:column>
+						<p:selectOneMenu id="categoria" value="#{consultarServicosMB.search.categoria}" >
+							<f:selectItem itemLabel="Selecione" itemValue="" />
+							<f:selectItems value="#{consultarServicosMB.categorias}" var="categoria" 
+								itemLabel="#{categoria.nome}" itemValue="#{categoria}"  />
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<h:outputLabel value="#{msg['consultar.servico.autonomo']}:" />
+					</p:column>
+					<p:column>
+						<p:selectOneMenu id="autonomo" value="#{consultarServicosMB.search.autonomo}" >
+							<f:selectItem itemLabel="Selecione" itemValue="" />
+							<f:selectItems value="#{consultarServicosMB.autonomos}" var="autonomo" 
+								itemLabel="#{autonomo.nomeFantasia}" itemValue="#{autonomo}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<h:outputLabel value="#{msg['consultar.cidade.uf']}:" />
+					</p:column>
+					<p:column>
+						<p:selectOneMenu id="uf" value="#{consultarServicosMB.search.uf}">
+							<f:ajax listener="#{consultarServicosMB.buscarCidades}" render="cidade uf" execute="@this" event="change"/>
+							<f:selectItem itemLabel="Selecione" itemValue="" />
+							<f:selectItems value="#{consultarServicosMB.ufs}" var="uf" itemLabel="#{uf.nome}" itemValue="#{uf}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>	
+				<p:row>
+					<p:column>
+						<h:outputLabel value="#{msg['consultar.servicos.cidade']}:" />
+					</p:column>
+					<p:column id="cidades">
+						<p:selectOneMenu id="cidade" value="#{consultarServicosMB.search.cidade}">
+							<f:selectItem itemLabel="Selecione" itemValue="" />
+							<f:selectItems value="#{consultarServicosMB.cidades}" var="cidade" itemLabel="#{cidade.nome}" itemValue="#{cidade}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>	
+				<p:row>
+					<p:column colspan="2">
+						<p:spacer width="100%" height="20px"/>
+					
+						<h:panelGroup layout="block" style="text-align: right">
+							<p:commandButton value="#{msg['sistema.button.consultar']}" 
+								action="#{consultarServicosMB.consultar}" update=":servicos"/> 
+							<p:commandButton value="#{msg['sistema.button.limpar']}"
+								action="#{consultarServicosMB.limpar}" update="descricao, categoria, autonomo, uf, cidade, :servicos :growl" immediate="true"
+								process="@this"/>
+							<p:commandButton value="#{msg['sistema.button.nova']}" rendered="#{request.isUserInRole('ADMIN')}"
+								action="editar?faces-redirect=true" process="@this"/>
+						</h:panelGroup>
+					</p:column>
+				</p:row>
+			</h:panelGrid>
+		</h:form>
+		
+		<p:spacer width="100%" height="20px"/>
+		
+		<p:dataTable id="servicos" value="#{consultarServicosMB.servicos}" var="servico" paginator="true" 
+			paginatorPosition="bottom" rows="5">
+			<p:column headerText="#{msg['sistema.button.acoes']}" rendered="#{request.isUserInRole('ADMIN')}">
+				<h:panelGroup layout="block" style="width: 100%; text-align: center">
+					<h:form>
+						<h:outputLink value="#{request.contextPath}/paginas/servico/editar.xhtml?id=#{servico.id}" title="Editar" 
+							styleClass="ui-icon ui-icon-pencil" style="display: inline-block" />
+						<p:commandLink title="Excluir" styleClass="ui-icon ui-icon-trash" style="display: inline-block"
+							oncomplete="confirmarExclusao.show()">
+							<f:setPropertyActionListener target="#{consultarServicosMB.servico}" value="#{servico}" />
+						</p:commandLink>
+					</h:form>
+				</h:panelGroup>
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.codigo']}" rendered="#{request.isUserInRole('ADMIN')}">
+				<h:outputText value="#{servico.id}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.descricao']}">
+				<h:outputText value="#{servico.descricao}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.categoria']}">
+				<h:outputText value="#{servico.categoria.nome}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.autonomo']}">
+				<h:outputText value="#{servico.autonomo.nomeFantasia}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.lugares']}">
+				<ui:repeat var="cidadeServico" value="#{servico.cidadeServicoList}" varStatus="status">
+					<h:outputText value="#{cidadeServico.cidade.nome} - #{cidadeServico.cidade.uf}"  />
+					<ui:fragment rendered="#{!status.last}">
+  						<h:outputText value=", "  />
+  					</ui:fragment>
+				</ui:repeat>
+			</p:column>
+			<p:column headerText="#{msg['sistema.button.acoes']}">
+				<h:panelGroup layout="block" style="width: 100%; text-align: center">
+					<h:form>
+						<ui:fragment rendered="#{request.isUserInRole('CLIENTE')}">
+							<h:outputLink value="#{request.contextPath}/paginas/servico/solicitar.xhtml?id=#{servico.id}" title="Solicitar serviço" 
+								styleClass="ui-icon ui-icon-calendar" style="display: inline-block" />
+						</ui:fragment>		
+						<h:outputLink value="#{request.contextPath}/paginas/servico/historico.xhtml?id=#{servico.id}" title="Ver avaliações e comentários" 
+							styleClass="ui-icon ui-icon-comment" style="display: inline-block" />	
+					</h:form>
+				</h:panelGroup>
+			</p:column>
+		</p:dataTable>
+	</ui:define>
+	
+	<ui:define name="dialogs">
+		<p:dialog header="Confirmar" widgetVar="confirmarExclusao" width="400" resizable="false">
+			<h:outputText value="Deseja realmente excluir?"/>
+			
+			<p:spacer width="100%" height="20px"/>
+			
+			<h:form>
+				<h:panelGroup layout="block" style="text-align: right">
+					<p:commandButton value="Sim" action="#{consultarServicosMB.excluir}" oncomplete="confirmarExclusao.hide()"
+						update=":servicos" />
+					<p:commandButton value="Não" onclick="confirmarExclusao.hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
+

@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/WEB-INF/templates/master.xhtml">
+	
+	<ui:define name="titulo">
+		#{msg['menu.autonomos.titulo']}
+	</ui:define>
+
+	<ui:define name="content">
+		<p:breadCrumb>
+			<p:menuitem value="SSG" url="/index.xhtml"/>
+			<p:menuitem value="#{msg['menu.meusServicos.titulo']}" url="#"/>
+		</p:breadCrumb>
+		
+		<p:spacer width="100%" height="50px"/>
+		
+		<h:form style="width: 100px; margin: auto">
+			<p:commandButton value="Novo" action="/paginas/servico/editar?faces-redirect=true" />
+		</h:form>
+		
+		<p:spacer width="100%" height="20px"/>
+	
+		<p:dataTable id="autonomos" value="#{meusServicosMB.servicos}" var="servico" paginator="true" 
+			paginatorPosition="bottom" rows="5" style="width: 700px; margin: auto">
+			<p:column headerText="#{msg['sistema.button.acoes']}">
+				<h:panelGroup layout="block" style="width: 100%; text-align: center">
+					<h:form>
+						<h:outputLink value="#{request.contextPath}/paginas/servico/editar.xhtml?id=#{servico.id}" title="Editar" 
+							styleClass="ui-icon ui-icon-pencil" style="display: inline-block" />
+						<p:commandLink title="Excluir" styleClass="ui-icon ui-icon-trash" style="display: inline-block"
+							oncomplete="confirmarExclusao.show()">
+							<f:setPropertyActionListener target="#{meusServicosMB.servico}" value="#{servico}" />
+						</p:commandLink>
+						<h:outputLink value="#{request.contextPath}/paginas/servico/historico.xhtml?id=#{servico.id}" title="Ver avaliações e comentários" 
+							styleClass="ui-icon ui-icon-comment" style="display: inline-block" />
+					</h:form>
+				</h:panelGroup>
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.descricao']}">
+				<h:outputText value="#{servico.descricao}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.categoria']}">
+				<h:outputText value="#{servico.categoria.nome}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.cidades']}">
+				<ui:repeat var="cidadeServico" value="#{servico.cidadeServicoList}">
+					<h:outputText value="#{cidadeServico.cidade.nome} (#{cidadeServico.cidade.uf.sigla})"/>
+				</ui:repeat>
+			</p:column>
+		</p:dataTable>
+	</ui:define>
+	
+	<ui:define name="dialogs">
+		<p:dialog header="Confirmar" widgetVar="confirmarExclusao" width="400" resizable="false">
+			<h:outputText value="Deseja realmente excluir?"/>
+			
+			<p:spacer width="100%" height="20px"/>
+			
+			<h:form>
+				<h:panelGroup layout="block" style="text-align: right">
+					<p:commandButton value="Sim" action="#{meusServicosMB.excluir}" oncomplete="confirmarExclusao.hide()"
+						update=":autonomos" />
+					<p:commandButton value="Não" onclick="confirmarExclusao.hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

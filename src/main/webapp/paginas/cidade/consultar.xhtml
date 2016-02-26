@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/WEB-INF/templates/master.xhtml">
+	
+	<ui:define name="titulo">
+		#{msg['menu.cidades.titulo']}
+	</ui:define>
+
+	<ui:define name="content">
+		<p:breadCrumb>
+			<p:menuitem value="SSG" url="/index.xhtml"/>
+			<p:menuitem value="#{msg['menu.cidades.titulo']}" url="#"/>
+		</p:breadCrumb>
+		
+		<p:spacer width="100%" height="20px"/>
+	
+		<h:form style="width: 400px; margin: auto">
+			<h:panelGrid>
+				<p:row>
+					<p:column>
+						<h:outputLabel value="#{msg['consultar.cidade.nome']}:" />
+					</p:column>
+					<p:column>
+						<p:inputText id="nome" value="#{consultarCidadesMB.search.nome}"/>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column>
+						<h:outputLabel value="#{msg['consultar.cidade.uf']}:" />
+					</p:column>
+					<p:column>
+						<p:selectOneMenu id="uf" value="#{consultarCidadesMB.search.uf}">
+							<f:selectItem itemLabel="Selecione" itemValue="" />
+							<f:selectItems value="#{consultarCidadesMB.ufs}" var="uf" itemLabel="#{uf.nome}" itemValue="#{uf}"/>
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="2">
+						<p:spacer width="100%" height="20px"/>
+					
+						<h:panelGroup layout="block" style="text-align: right">
+							<p:commandButton value="#{msg['sistema.button.consultar']}" 
+								action="#{consultarCidadesMB.consultar}" update=":cidades"/> 
+							<p:commandButton value="#{msg['sistema.button.limpar']}"
+								action="#{consultarCidadesMB.limpar}" update="nome, uf, :cidades" immediate="true"
+								process="@this"/>
+							<p:commandButton value="#{msg['sistema.button.nova']}" 
+								action="editar?faces-redirect=true" process="@this"/>	
+							
+						</h:panelGroup>
+					</p:column>
+				</p:row>				
+			</h:panelGrid>
+		</h:form>
+		
+		<p:spacer width="100%" height="20px"/>
+		
+		<p:dataTable id="cidades" value="#{consultarCidadesMB.cidades}" var="cidade" paginator="true" 
+			paginatorPosition="bottom" rows="5">
+			<p:column headerText="#{msg['sistema.button.acoes']}">
+				<h:panelGroup layout="block" style="width: 100%; text-align: center">
+					<h:form>
+						<h:outputLink value="#{request.contextPath}/paginas/cidade/editar.xhtml?id=#{cidade.id}" title="Editar" 
+							styleClass="ui-icon ui-icon-pencil" style="display: inline-block" />
+						<p:commandLink title="Excluir" styleClass="ui-icon ui-icon-trash" style="display: inline-block"
+							oncomplete="confirmarExclusao.show()">
+							<f:setPropertyActionListener target="#{consultarCidadesMB.cidade}" value="#{cidade}" />
+						</p:commandLink>
+					</h:form>
+				</h:panelGroup>
+			</p:column>
+			<p:column headerText="#{msg['consultar.cidade.codigo']}">
+				<h:outputText value="#{cidade.id}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.cidade.nome']}">
+				<h:outputText value="#{cidade.nome}" />
+			</p:column>
+		</p:dataTable>
+	</ui:define>
+	
+	<ui:define name="dialogs">
+		<p:dialog header="Confirmar" widgetVar="confirmarExclusao" width="400" resizable="false">
+			<h:outputText value="Deseja realmente excluir?"/>
+			
+			<p:spacer width="100%" height="20px"/>
+			
+			<h:form>
+				<h:panelGroup layout="block" style="text-align: right">
+					<p:commandButton value="Sim" action="#{consultarCidadesMB.excluir}" oncomplete="confirmarExclusao.hide()"
+						update=":cidades" />
+					<p:commandButton value="Não" onclick="confirmarExclusao.hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

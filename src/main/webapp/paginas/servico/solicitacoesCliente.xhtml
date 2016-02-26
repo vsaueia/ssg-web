@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/WEB-INF/templates/master.xhtml">
+	
+	<ui:define name="titulo">
+		#{msg['menu.servicos.agendamentos']}
+	</ui:define>
+
+	<ui:define name="content">
+		<p:breadCrumb>
+			<p:menuitem value="SSG" url="/index.xhtml"/>
+			<p:menuitem value="#{msg['menu.servicos.agendamentos']}" url="#"/>
+		</p:breadCrumb>
+		
+		<p:spacer width="100%" height="20px"/>
+	
+		<h:form style="width: 400px; margin: auto">
+			<h:panelGrid>
+				<p:row>
+					<p:column>
+						<h:outputLabel value="STATUS" />
+					</p:column>
+					<p:column>
+						<p:selectOneMenu id="situacao" value="#{solicitarServicosMB.situacaoServico}" >
+							<f:selectItem itemLabel="Selecione" itemValue="" />
+							<f:selectItems value="#{solicitarServicosMB.situacoes}" var="situacao" 
+								itemLabel="#{situacao}" itemValue="#{situacao}"  />
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+				<p:row>
+					<p:column colspan="2">
+						<p:spacer width="100%" height="20px"/>
+					
+						<h:panelGroup layout="block" style="text-align: right">
+							<p:commandButton value="#{msg['sistema.button.consultar']}" 
+								action="#{solicitarServicosMB.consultar}" update=":solicitacaoesServicos :growl"/> 
+							<p:commandButton value="#{msg['sistema.button.limpar']}"
+								action="#{solicitarServicosMB.limpar}" update=":solicitacaoesServicos situacao :growl" immediate="true"
+								process="@this"/>
+						</h:panelGroup>
+					</p:column>
+				</p:row>
+			</h:panelGrid>
+		</h:form>
+		
+		<p:spacer width="100%" height="20px"/>
+		
+		<p:dataTable id="solicitacaoesServicos" value="#{solicitarServicosMB.solicitacoes}" var="solicitacao" paginator="true" 
+			paginatorPosition="bottom" rows="5">
+			<p:column headerText="#{msg['sistema.button.acoes']}" >
+				<h:panelGroup layout="block" style="width: 100%; text-align: center">
+					<h:form>
+						<p:commandLink title="#{msg['sistema.button.excluir']}" styleClass="ui-icon ui-icon-trash" style="display: inline-block"
+							oncomplete="confirmarExclusao.show()">
+							<f:setPropertyActionListener target="#{solicitarServicosMB.solicitacaoServico}" value="#{solicitacao}" />
+						</p:commandLink>
+						<ui:fragment rendered="#{solicitacao.situacaoServico == 'EXECUTADO'}">
+							<h:outputLink value="#{request.contextPath}/paginas/servico/avaliar.xhtml?idSolicitacao=#{solicitacao.id}" title="#{msg['acao.avaliar.servico']}" 
+								styleClass="ui-icon ui-icon-clipboard" style="display: inline-block" />
+						</ui:fragment>
+					</h:form>
+				</h:panelGroup>
+			</p:column>
+			<p:column headerText="#{msg['solicitacao.data']}">
+				<h:outputText value="#{solicitacao.dataSolicitacao}">
+					<f:convertDateTime pattern="dd.MM.yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.descricao']}">
+				<h:outputText value="#{solicitacao.servico.descricao}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.categoria']}">
+				<h:outputText value="#{solicitacao.servico.categoria.nome}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.servico.autonomo']}">
+				<h:outputText value="#{solicitacao.servico.autonomo.nomeFantasia}" />
+			</p:column>
+			<p:column headerText="STATUS">
+				<h:outputText value="#{solicitacao.situacaoServico}" />
+			</p:column>
+			
+			<p:column headerText="Minha avaliação">
+				<p:rating value="#{solicitarServicosMB.getNotaFromSolicitacao(solicitacao)}" stars="5" cancel="false" readonly="true"/>
+			</p:column>
+		</p:dataTable>
+	</ui:define>
+	
+	<ui:define name="dialogs">
+		<p:dialog header="#{msg['sistema.confirmar']}" widgetVar="confirmarExclusao" width="400" resizable="false">
+			<h:outputText value="#{sistema.confirmacao.exclusao}"/>
+			
+			<p:spacer width="100%" height="20px"/>
+			
+			<h:form>
+				<h:panelGroup layout="block" style="text-align: right">
+					<p:commandButton value="#{msg['sistema.sim.label']}" action="#{solicitarServicosMB.excluir}" oncomplete="confirmarExclusao.hide()"
+						update=":solicitacaoesServicos" />
+					<p:commandButton value="#{msg['sistema.nao.label']}" onclick="confirmarExclusao.hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+	
+	
+</ui:composition>
+

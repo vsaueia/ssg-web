@@ -1,0 +1,33 @@
+<!-- <?xml version="1.0" encoding="UTF-8"?> -->
+<persistence version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+	<persistence-unit name="ssg" transaction-type="JTA">
+		<jta-data-source>jdbc/ssg</jta-data-source>
+
+		<class>br.com.tnt.ssg.dmp.AgendamentoServico</class>
+		<class>br.com.tnt.ssg.dmp.Autonomo</class>
+		<class>br.com.tnt.ssg.dmp.Avaliacao</class>
+		<class>br.com.tnt.ssg.dmp.Categoria</class>
+		<class>br.com.tnt.ssg.dmp.Cidade</class>
+		<class>br.com.tnt.ssg.dmp.CidadeServico</class>
+		<class>br.com.tnt.ssg.dmp.Cliente</class>
+		<class>br.com.tnt.ssg.dmp.Contato</class>
+		<class>br.com.tnt.ssg.dmp.Permissao</class>
+		<class>br.com.tnt.ssg.dmp.Servico</class>
+		<class>br.com.tnt.ssg.dmp.SolicitacaoServico</class>
+		<class>br.com.tnt.ssg.dmp.UF</class>
+		<class>br.com.tnt.ssg.dmp.Usuario</class>
+		<class>br.com.tnt.ssg.dmp.UsuarioPermissao</class>
+		
+		<properties>
+<!-- 			<property name="eclipselink.ddl-generation" value="create-tables"/> -->
+<!--             <property name="eclipselink.create-ddl-jdbc-file-name" value="createDDL_ddlGeneration.jdbc"/> -->
+<!-- 			<property name="eclipselink.ddl-generation.output-mode" value="sql-script"/> -->
+<!-- 			<property name="eclipselink.application-location" value="/home/rherebia/Desktop"/> -->
+			
+			<property name="eclipselink.logging.level.sql" value="FINE"/>
+ 			<property name="eclipselink.logging.parameters" value="true"/>
+		</properties>
+	</persistence-unit>
+</persistence>

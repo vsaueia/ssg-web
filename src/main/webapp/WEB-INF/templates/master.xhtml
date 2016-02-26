@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+    <h:head>
+    	<title>#{msg['sistema.titulo']} - <ui:insert name="titulo" /></title>
+    	
+    	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    	
+    	<h:outputScript name="jsf.js" library="javax.faces"/>
+    	
+    	<h:outputStylesheet name="css/default.css"/>
+	</h:head>
+
+	<h:body style="height: 100%">
+		<f:view contentType="text/html">
+			<p:layout fullPage="true" widgetVar="layoutDetran">
+				<p:layoutUnit position="north" size="120"  gutter="0">
+					<h:panelGrid columns="3" style="width: 100%" 
+						columnClasses="left-header, center-header, right-header">
+						<h:panelGroup></h:panelGroup>
+						<h:panelGroup layout="block" style="text-align: center">
+							<h1>#{msg['sistema.titulo']}</h1>
+						</h:panelGroup>
+						<h:panelGroup layout="block" style="text-align: right">
+							<h:form>
+								<h:outputText value="#{request.remoteUser}"/>
+								<br />
+								<h:commandLink value="Sair" action="#{loginMB.logout}" />
+							</h:form>
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:layoutUnit>
+				
+				<p:layoutUnit
+	                position="west"
+	                gutter="0"
+	                resizable="false"
+	                size="250" 
+	                collapsible="true"
+	                scrollable="true">
+	                <h:form>
+		                <p:menu style="width: 95%" >
+		                	<p:submenu label="#{msg['menu.administrar']}" rendered="#{request.isUserInRole('ADMIN')}">
+			                	<p:menuitem value="#{msg['menu.categorias']}" action="/paginas/categoria/consultar?faces-redirect=true"/>
+			                	<p:menuitem value="#{msg['menu.cidades']}" action="/paginas/cidade/consultar?faces-redirect=true" />
+			                	<p:menuitem value="#{msg['menu.ufs']}" action="/paginas/uf/consultar?faces-redirect=true" /> 
+			                	<p:menuitem value="#{msg['menu.relatorios.titulo']}" action="/paginas/relatorios/relatorios?faces-redirect=true" /> 
+		                	</p:submenu>
+		                	<p:submenu label="#{msg['menu.opcoes']}">
+			                	<p:menuitem value="#{msg['menu.servicos.cliente.titulo']}" action="/paginas/servico/consultar?faces-redirect=true" rendered="#{request.isUserInRole('CLIENTE')}"/>
+			                	<p:menuitem value="#{msg['menu.meusServicos.titulo']}" action="/paginas/autonomo/meusServicos?faces-redirect=true" rendered="#{request.isUserInRole('AUTONOMO')}"/>
+			                	<p:menuitem value="#{msg['menu.solicitacoesServicos.titulo']}" action="/paginas/autonomo/solicitacoesServicos?faces-redirect=true" rendered="#{request.isUserInRole('AUTONOMO')}"/>
+			                	<p:menuitem value="#{msg['menu.servicos.agendamentos']}" action="/paginas/servico/solicitacoesCliente?faces-redirect=true" rendered="#{request.isUserInRole('CLIENTE')}"/>
+		                	</p:submenu>
+		                </p:menu>
+	                </h:form>
+	            </p:layoutUnit>
+				
+				<p:layoutUnit position="center" gutter="0" scrollable="true">
+					<h:panelGroup layout="block" style="width: 100%">
+						<p:growl id="growl" autoUpdate="true"/>
+					
+						<ui:insert name="content" />
+					</h:panelGroup>
+				</p:layoutUnit>
+			</p:layout>
+			
+			<ui:insert name="dialogs" />
+		</f:view>
+	</h:body>
+</html>

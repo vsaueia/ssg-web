@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/templates/signup.xhtml">
+	
+	<ui:define name="titulo">
+		#{msg['menu.autonomos.titulo']}
+	</ui:define>
+
+	<ui:define name="content">
+		<p:spacer width="100%" height="20px"/>
+	
+		<h:form id="autonomoForm">
+			<p:fieldset legend="Sign up" style="width: 700px; margin: auto">
+				<h:panelGrid style="width: 400px; margin: auto">
+					<p:row>
+						<p:column>
+							<h:outputLabel value="#{msg['consultar.autonomo.nomeFantasia']}:" />
+						</p:column>
+						<p:column>
+							<p:inputText value="#{editarAutonomosMB.autonomo.nomeFantasia}" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<h:outputLabel value="#{msg['consultar.autonomo.cpf']}:" />
+						</p:column>
+						<p:column>
+							<p:inputMask value="#{editarAutonomosMB.autonomo.cpf}" mask="999.999.999-99"
+								 />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<h:outputLabel value="#{msg['consultar.autonomo.login']}:" />
+						</p:column>
+						<p:column>
+							<p:inputText value="#{editarAutonomosMB.autonomo.usuario.login}" autocomplete="off" 
+								 />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<h:outputLabel value="#{msg['consultar.autonomo.senha']}:" />
+						</p:column>
+						<p:column>
+							<p:password value="#{editarAutonomosMB.autonomo.usuario.senha}" autocomplete="off" 
+								/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<h:outputLabel value="#{msg['consultar.autonomo.confirmarSenha']}:" />
+						</p:column>
+						<p:column>
+							<p:password value="#{editarAutonomosMB.confirmacao}" autocomplete="off" 
+								/>
+						</p:column>
+					</p:row>
+				</h:panelGrid>
+			
+			
+				<p:spacer width="100%" height="20px"/>
+				
+				<p:fieldset legend="Contatos" style="width: 600px; margin: auto">
+					<h:panelGrid style="width: 400px; margin: auto">
+						<p:row>
+							<p:column>
+								<h:outputLabel value="#{msg['editar.autonomo.contato.tipo']}" />
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="tipoContato" value="#{editarAutonomosMB.contatoMD.contato.tipo}">
+									<f:selectItem itemLabel="" itemValue="" />
+									<f:selectItems value="#{editarAutonomosMB.tiposContato}"/>
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputLabel value="#{msg['editar.autonomo.contato.descricao']}"/>
+							</p:column>
+							<p:column>
+								<h:inputText id="descricaoTipoContato" value="#{editarAutonomosMB.contatoMD.contato.descricao}"
+									autocomplete="off"/>
+							</p:column>
+						</p:row>
+					</h:panelGrid>
+					
+					<p:spacer width="100%" height="20px"/>
+					
+					<h:panelGroup layout="block" style="text-align: center">
+						<p:commandButton value="#{msg['sistema.button.adicionar']}" action="#{editarAutonomosMB.contatoMD.adicionarDetalhe}"
+							update="contatosDT, :growl, :autonomoForm:tipoContato, :autonomoForm:descricaoTipoContato" />
+						<p:commandButton value="Cancelar" action="#{editarAutonomosMB.contatoMD.limparDetalhe}" 
+							update=":autonomoForm:tipoContato, :autonomoForm:descricaoTipoContato"/>
+					</h:panelGroup>
+					
+					<p:spacer width="100%" height="20px"/>
+	
+					<p:dataTable id="contatosDT" value="#{editarAutonomosMB.contatoMD.contatos}" var="contato">
+						<p:column headerText="#{msg['sistema.button.acoes']}" style="text-align: center">
+							<p:commandLink title="Editar" update=":autonomoForm:tipoContato, :autonomoForm:descricaoTipoContato"
+								styleClass="ui-icon ui-icon-pencil" style="display: inline-block">
+								<f:setPropertyActionListener target="#{editarAutonomosMB.contatoMD.contato}" value="#{contato}" />
+							</p:commandLink>
+							<p:commandLink title="Excluir" styleClass="ui-icon ui-icon-trash" style="display: inline-block"
+								oncomplete="confirmarExclusao.show()">
+								<f:setPropertyActionListener target="#{editarAutonomosMB.contatoMD.contato}" value="#{contato}" />
+							</p:commandLink>
+						</p:column>
+						<p:column headerText="#{msg['editar.autonomo.contato.tipo']}">
+							<h:outputText value="#{contato.tipo}"/>
+						</p:column>
+						<p:column headerText="#{msg['editar.autonomo.contato.descricao']}">
+							<h:outputText value="#{contato.descricao}"/>
+						</p:column>
+					</p:dataTable>				
+				</p:fieldset>
+				
+				<p:spacer width="100%" height="20px"/>
+				
+				<h:panelGroup layout="block" style="text-align: right;">
+					<p:commandButton value="Salvar" action="#{editarAutonomosMB.salvar}" />
+					<p:commandButton value="Voltar ao login" action="/index?faces-redirect=true" />
+				</h:panelGroup>
+			</p:fieldset>
+		</h:form>
+	</ui:define>
+	
+	<ui:define name="dialogs">
+		<p:dialog header="Confirmar" widgetVar="confirmarExclusao" width="400" resizable="false">
+			<h:outputText value="Deseja realmente excluir?"/>
+			
+			<p:spacer width="100%" height="20px"/>
+			
+			<h:form>
+				<h:panelGroup layout="block" style="text-align: right">
+					<p:commandButton value="Sim" action="#{editarAutonomosMB.contatoMD.removerDetalhe}" 
+						oncomplete="confirmarExclusao.hide()" update=":autonomoForm:contatosDT" />
+					<p:commandButton value="Não" onclick="confirmarExclusao.hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

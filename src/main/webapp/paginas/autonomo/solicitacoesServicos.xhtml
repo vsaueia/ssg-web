@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/WEB-INF/templates/master.xhtml">
+	
+	<ui:define name="titulo">
+		#{msg['menu.solicitacoesServicos.titulo']}
+	</ui:define>
+
+	<ui:define name="content">
+		<p:breadCrumb>
+			<p:menuitem value="SSG" url="/index.xhtml"/>
+			<p:menuitem value="#{msg['menu.solicitacoesServicos.titulo']}" url="#"/>
+		</p:breadCrumb>
+		
+		<p:spacer width="100%" height="50px"/>
+		
+		<h:form style="width: 225px; margin: auto">
+			<h:panelGrid>
+				<p:row>
+					<p:column>
+						<h:outputText value="Situação: "/>
+					</p:column>
+					<p:column>
+						<p:selectOneMenu value="#{solicitacoesServicosMB.situacao}">
+							<f:selectItem itemLabel="" itemValue="" />
+							<f:selectItems value="#{solicitacoesServicosMB.situacoes}" />
+							<p:ajax event="change" listener="#{solicitacoesServicosMB.consultarSolicitacoesPorSituacao}" 
+								update=":solicitacoesServicos" process="@this" />
+						</p:selectOneMenu>
+					</p:column>
+				</p:row>
+			</h:panelGrid>
+		</h:form>
+		
+		<p:spacer width="100%" height="20px"/>
+		
+		<p:dataTable id="solicitacoesServicos" value="#{solicitacoesServicosMB.solicitacoesServicos}" 
+			var="solicitacaoServico" paginator="true" paginatorPosition="bottom" rows="5" 
+			style="width: 700px; margin: auto">
+			<p:column headerText="#{msg['sistema.button.acoes']}">
+				<h:panelGroup layout="block" style="width: 100%; text-align: center">
+					<h:form>
+						<p:commandLink title="Agendar" styleClass="ui-icon ui-icon-calendar" style="display: inline-block"
+							action="#{solicitacoesServicosMB.novoAgendamento}" oncomplete="agendarServico.show()"
+							rendered="#{solicitacaoServico.situacaoServico eq 'SOLICITADO'}">
+							<f:setPropertyActionListener target="#{solicitacoesServicosMB.solicitacaoServico}" value="#{solicitacaoServico}" />
+						</p:commandLink>
+						<p:commandLink title="Finalizar" styleClass="ui-icon ui-icon-check" style="display: inline-block"
+							oncomplete="finalizarServico.show()" rendered="#{solicitacaoServico.situacaoServico eq 'AGENDADO'}">
+							<f:setPropertyActionListener target="#{solicitacoesServicosMB.solicitacaoServico}" value="#{solicitacaoServico}" />
+						</p:commandLink>
+					</h:form>
+				</h:panelGroup>
+			</p:column>
+			<p:column headerText="#{msg['consultar.solicitacaoServico.servico']}">
+				<h:outputText value="#{solicitacaoServico.servico.descricao}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.solicitacaoServico.cliente']}">
+				<h:outputText value="#{solicitacaoServico.cliente.nome}" />
+			</p:column>
+			<p:column headerText="#{msg['consultar.solicitacaoServico.contatos']}">
+				<ui:repeat var="contato" value="#{solicitacaoServico.cliente.contatos}">
+					<h:outputText value="#{contato.descricao}"/>
+					<br/>
+				</ui:repeat>
+			</p:column>
+		</p:dataTable>
+	</ui:define>
+	
+	<ui:define name="dialogs">
+		<p:dialog header="Agendar Serviço" widgetVar="agendarServico" width="550" resizable="false">
+			<h:form>
+				<h:panelGrid>
+					<p:row>
+						<p:column>
+							<h:outputText value="Data Agendamento: "/>
+						</p:column>
+						<p:column>
+							<p:calendar value="#{solicitacoesServicosMB.agendamentoServico.dataAgendamento}"
+								pattern="dd/MM/yyyy"/>
+						</p:column>
+					</p:row>
+				</h:panelGrid>
+				
+				<p:spacer width="100%" height="20px"/>
+			
+				<h:panelGroup layout="block" style="text-align: right">
+					<p:commandButton value="Agendar" action="#{solicitacoesServicosMB.agendarServico}" oncomplete="agendarServico.hide()"
+						update=":solicitacoesServicos" />
+					<p:commandButton value="Cancelar" onclick="agendarServico.hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+		
+		<p:dialog header="Finalizar Serviço" widgetVar="finalizarServico" width="550" resizable="false">
+			<h:form>
+				<h:outputText value="Deseja realmente finalizar o serviço?"/>
+			
+				<h:panelGroup layout="block" style="text-align: right">
+					<p:commandButton value="Finalizar" action="#{solicitacoesServicosMB.finalizarServico}" 
+						oncomplete="finalizarServico.hide()" update=":solicitacoesServicos" />
+					<p:commandButton value="Cancelar" onclick="finalizarServico.hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

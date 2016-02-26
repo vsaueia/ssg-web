@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/templates/master.xhtml">
+	
+	<ui:define name="titulo">
+		#{msg['menu.cidades.titulo']}
+	</ui:define>
+
+	<ui:define name="content">
+<!-- 		<c:set target="#{flash}" property="keepMessages" value="true" /> -->
+	
+		<p:breadCrumb>
+			<p:menuitem value="SSG" url="/index.xhtml"/>
+			<p:menuitem value="#{msg['menu.meusServicos.titulo']}" url="#"/>
+		</p:breadCrumb>
+		
+		<p:spacer width="100%" height="20px"/>
+	
+		<h:form id="servicoForm">
+			<p:fieldset legend="Serviço" style="width: 700px; margin: auto">
+				<h:panelGrid style="width: 400px; margin: auto">
+					<p:row>
+						<p:column>
+							<h:outputLabel value="#{msg['consultar.servico.descricao']}:" />
+						</p:column>
+						<p:column>
+							<p:inputText id="descricao" value="#{editarServicosMB.servico.descricao}"/>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<h:outputLabel value="#{msg['consultar.servico.categoria']}:" />
+						</p:column>
+						<p:column>
+							<p:selectOneMenu id="categoria" value="#{editarServicosMB.servico.categoria}">
+								<f:selectItem itemLabel="Selecione" itemValue="" />
+								<f:selectItems value="#{editarServicosMB.categorias}" var="categoria" 
+									itemLabel="#{categoria.nome}" itemValue="#{categoria}"/>
+							</p:selectOneMenu>
+						</p:column>
+					</p:row>
+				</h:panelGrid>
+				
+				<p:spacer width="100%" height="20px"/>
+				
+				<p:fieldset legend="Cidades" style="width: 600px; margin: auto">
+					<h:panelGrid style="width: 400px; margin: auto">
+						<p:row>
+							<p:column>
+								<h:outputLabel value="#{msg['editar.servico.cidade.uf']}" />
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="uf" value="#{editarServicosMB.uf}" required="true">
+									<p:ajax event="change" process="@this" listener="#{editarServicosMB.buscarCidades}"
+										update="cidade"/>
+									<f:selectItem itemLabel="" itemValue="" />
+									<f:selectItems value="#{editarServicosMB.ufs}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<h:outputLabel value="#{msg['editar.servico.cidade.nome']}"/>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu id="cidade" value="#{editarServicosMB.cidadeServicoMD.cidadeServico.cidade}"
+									required="true">
+									<f:selectItem itemLabel="" itemValue="" />
+									<f:selectItems value="#{editarServicosMB.cidades}" var="cidade" 
+										itemLabel="#{cidade.nome}" itemValue="#{cidade}"/>
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+					</h:panelGrid>
+					
+					<p:spacer width="100%" height="20px"/>
+					
+					<h:panelGroup layout="block" style="text-align: center">
+						<p:commandButton value="#{msg['sistema.button.adicionar']}" action="#{editarServicosMB.adicionarDetalhe}"
+							process="uf, cidade, @this" update="cidadesDT, :growl, uf, cidade" />
+						<p:commandButton value="Cancelar" action="#{editarServicosMB.cidadeServicoMD.limparDetalhe}" 
+							immediate="true" />
+					</h:panelGroup>
+					
+					<p:spacer width="100%" height="20px"/>
+	
+					<p:dataTable id="cidadesDT" value="#{editarServicosMB.cidadeServicoMD.cidadesServico}" var="cidadeServico">
+						<p:column headerText="#{msg['sistema.button.acoes']}" style="text-align: center">
+							<p:commandLink title="Editar" update=":servicoForm:uf, :servicoForm:cidade"
+								styleClass="ui-icon ui-icon-pencil" style="display: inline-block">
+								<f:setPropertyActionListener target="#{editarServicosMB.cidadeServicoMD.cidadeServico}" value="#{cidadeServico}" />
+							</p:commandLink>
+							<p:commandLink title="Excluir" styleClass="ui-icon ui-icon-trash" style="display: inline-block"
+								oncomplete="confirmarExclusao.show()">
+								<f:setPropertyActionListener target="#{editarServicosMB.cidadeServicoMD.cidadeServico}" value="#{cidadeServico}" />
+							</p:commandLink>
+						</p:column>
+						<p:column headerText="#{msg['editar.servico.cidade.nome']}">
+							<h:outputText value="#{cidadeServico.cidade.nome}"/>
+						</p:column>
+						<p:column headerText="#{msg['editar.servico.cidade.uf']}">
+							<h:outputText value="#{cidadeServico.cidade.uf.sigla}"/>
+						</p:column>
+					</p:dataTable>
+				</p:fieldset>
+				
+				<p:spacer width="100%" height="20px"/>
+				
+				<h:panelGroup layout="block" style="text-align: right">
+					<p:commandButton value="Salvar" action="#{editarServicosMB.salvar}"  
+						process="descricao, categoria, @this" update=":growl" />
+					<p:commandButton value="Cancelar" action="/paginas/autonomo/meusServicos?faces-redirect=true" 
+						immediate="true"/>
+				</h:panelGroup>
+			</p:fieldset>
+		</h:form>
+	</ui:define>
+	
+	<ui:define name="dialogs">
+		<p:dialog header="Confirmar" widgetVar="confirmarExclusao" width="400" resizable="false">
+			<h:outputText value="Deseja realmente excluir?"/>
+			
+			<p:spacer width="100%" height="20px"/>
+			
+			<h:form>
+				<h:panelGroup layout="block" style="text-align: right">
+					<p:commandButton value="Sim" action="#{editarServicosMB.cidadeServicoMD.removerDetalhe}" 
+						oncomplete="confirmarExclusao.hide()" update=":servicoForm:cidadesDT" />
+					<p:commandButton value="Não" onclick="confirmarExclusao.hide()"/>
+				</h:panelGroup>
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>
